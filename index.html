@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوصلة الوعي: تأملات في عالم اليوم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Desert Sands & Papyrus with subtle modern accents -->
+    <!-- Application Structure Plan: The SPA is designed as a guide through contemporary challenges. It starts with an engaging hero section. The core is a grid of interactive "Themes" cards, each representing a major topic from "قصة عالم اليوم." Clicking a card reveals a modal/expanded section with detailed content, LLM-generated reflection questions, and practical insights. Global audio controls are positioned discreetly. This structure encourages thematic exploration and deep, AI-guided reflection on modern life. -->
+    <!-- Visualization & Content Choices: 1. Hero: Bold title, descriptive text, clear call to action. 2. Themes Grid: Cards with titles, brief descriptions, and emojis. On click, they trigger a modal or expand an inline detail section. 3. Theme Detail View (Modal/Expanded): Contains the full text for the theme, an "تأمل عميق ✨" button (LLM-powered reflection question), and a "وجهة نظر عملية 🧭" button (LLM-powered actionable wisdom). A new "ربط بالماضي 🔗" button (LLM-powered historical link) is added. Loading spinners provide visual feedback. 4. Audio (Tone.js): Gentle ambient music and subtle sound effects for interactions. Confirmed NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #FDF8F0;
+            color: #4E4234;
+        }
+        .bg-primary { background-color: #FDF8F0; }
+        .bg-secondary { background-color: #F5EFE1; }
+        .text-primary { color: #4E4234; }
+        .text-accent { color: #8D6B4C; }
+        .border-accent { border-color: #D4A056; }
+        .bg-accent { background-color: #D4A056; }
+        .bg-accent-hover:hover { background-color: #C08C3B; }
+        .shadow-custom { box-shadow: 0 10px 25px -5px rgba(141, 107, 76, 0.1), 0 4px 6px -4px rgba(141, 107, 76, 0.1); }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #D4A056;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #FDF8F0;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #4E4234;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-primary">
+    <nav class="sticky top-0 z-50 bg-primary/80 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-accent">بوصلة الوعي</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4 space-x-reverse">
+                        <a href="#hero" class="text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium">البداية</a>
+                        <a href="#themes" class="text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium">تحديات العصر</a>
+                        <a href="#action" class="text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium">خطوتك القادمة</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="hero" class="min-h-screen flex items-center justify-center text-center px-4 py-16">
+            <div class="max-w-4xl">
+                <h1 class="text-4xl md:text-6xl font-bold text-accent leading-tight">عالمٌ يتغير... ووعيٌ يتجدد!</h1>
+                <p class="mt-6 text-lg md:text-xl text-primary max-w-2xl mx-auto">في زمنٍ تتلاطمُ فيهِ الأمواجُ، وتتداخلُ الحقائقُ، تحتاجُ بوصلةً ترشدُكَ. هذهِ تأملاتٌ في "قصةِ عالمِ اليومِ"، لِتُضيءَ لكَ الدربَ وتُعينَكَ على فهمِ واقعكَ بوعيٍ عميقٍ.</p>
+                <div class="mt-8">
+                    <a href="#themes" class="bg-accent text-white font-bold py-3 px-8 rounded-full text-lg bg-accent-hover transition-all duration-300 transform hover:scale-105">ابدأ التأمل ✨</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="themes" class="py-20 bg-secondary">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-accent">تحدياتُ العصرِ وبصائرُ الوعي</h2>
+                    <p class="mt-4 text-lg text-primary max-w-2xl mx-auto">في "قصةِ عالمِ اليومِ"، نُسلّطُ الضوءَ على محاورَ أساسيةٍ تُشكِّلُ واقعنا. انقر على كلِّ محورٍ لِتتعمقَ وتُحصلَ على بصائرَ مُلهمةٍ.</p>
+                </div>
+
+                <div class="mt-16 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+                    <!-- Theme Card 1: تيارُ السطحيةِ والبحثُ عن المعنى -->
+                    <div class="bg-primary p-6 rounded-xl shadow-custom transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="openThemeModal(0)">
+                        <span class="text-5xl mb-4 block">📱</span>
+                        <h3 class="text-xl font-bold text-accent mb-2">تيارُ السطحيةِ والبحثُ عن المعنى</h3>
+                        <p class="text-primary">كيفَ يُؤثرُ طوفانُ المعلوماتِ والترفيهِ على وعينا، ويُبعدنا عن جوهرِ الوجودِ؟</p>
+                    </div>
+
+                    <!-- Theme Card 2: سحرُ المادةِ وغيابُ القناعةِ -->
+                    <div class="bg-primary p-6 rounded-xl shadow-custom transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="openThemeModal(1)">
+                        <span class="text-5xl mb-4 block">💰</span>
+                        <h3 class="text-xl font-bold text-accent mb-2">سحرُ المادةِ وغيابُ القناعةِ</h3>
+                        <p class="text-primary">التَعلُّقُ بالدنيا ومُشْكَلةُ البحثِ عن السعادةِ في غيرِ مكانها.</p>
+                    </div>
+
+                    <!-- Theme Card 3: الانقسامُ والوحدةُ الضائعةُ -->
+                    <div class="bg-primary p-6 rounded-xl shadow-custom transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="openThemeModal(2)">
+                        <span class="text-5xl mb-4 block">💔</span>
+                        <h3 class="text-xl font-bold text-accent mb-2">الانقسامُ والوحدةُ الضائعةُ</h3>
+                        <p class="text-primary">لماذا تتزايدُ الانقساماتُ الفكريةُ والمجتمعيةُ، وكيفَ نُعيدُ اللحمةَ؟</p>
+                    </div>
+
+                    <!-- Theme Card 4: إرهاقُ الروحِ والبحثُ عن السكينةِ -->
+                    <div class="bg-primary p-6 rounded-xl shadow-custom transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="openThemeModal(3)">
+                        <span class="text-5xl mb-4 block">🧘</span>
+                        <h3 class="text-xl font-bold text-accent mb-2">إرهاقُ الروحِ والبحثُ عن السكينةِ</h3>
+                        <p class="text-primary">ضغوطُ الحياةِ الحديثةِ وتأثيرها على الصحةِ النفسيةِ وضرورةُ الاستجماعِ.</p>
+                    </div>
+
+                    <!-- Theme Card 5: قوةُ العلمِ ومسؤوليةُ الإنسانِ -->
+                    <div class="bg-primary p-6 rounded-xl shadow-custom transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="openThemeModal(4)">
+                        <span class="text-5xl mb-4 block">🔬</span>
+                        <h3 class="text-xl font-bold text-accent mb-2">قوةُ العلمِ ومسؤوليةُ الإنسانِ</h3>
+                        <p class="text-primary">كيفَ يُمكنُ للعلمِ أن يكونَ سلاحاً ذا حدينِ، ومسؤوليتنا في توجيهه للخيرِ؟</p>
+                    </div>
+
+                    <!-- Theme Card 6: العزلةُ الافتراضيةُ وواقعُ الاتصالِ -->
+                    <div class="bg-primary p-6 rounded-xl shadow-custom transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="openThemeModal(5)">
+                        <span class="text-5xl mb-4 block">🌐</span>
+                        <h3 class="text-xl font-bold text-accent mb-2">العزلةُ الافتراضيةُ وواقعُ الاتصالِ</h3>
+                        <p class="text-primary">تأثيرُ العالمِ الرقميِّ على علاقاتنا الإنسانيةِ وضرورةُ الاتصالِ الحقيقيِّ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="action" class="py-20 bg-primary">
+            <div class="max-w-3xl mx-auto text-center px-4">
+                <h2 class="text-3xl font-bold text-accent">خطوتك القادمة: كن بوصلةً لوعيك!</h2>
+                <p class="mt-4 text-lg text-primary">بعدَ التأملِ في تحدياتِ عالمِ اليومِ، تذكرْ أنَّ التغييرَ يبدأُ من داخلكَ. كُنْ أنتَ البوصلةَ التي تُرشدُكَ نحو الوعيِ العميقِ والفعلِ الإيجابيِّ.</p>
+                <p class="mt-6 text-xl font-bold text-accent">الوعيُ ليسَ مجردَ معرفةٍ، بل هوَ فعلٌ يُحوِّلُكَ ويُحوِّلُ عالمَكَ.</p>
+                <div class="mt-8">
+                     <p class="text-2xl font-bold text-primary">ما هي البصيرةُ التي ستُطبقها اليومَ؟</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-secondary">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-primary">
+            <p>&copy; 2025 بوصلة الوعي - تأملات في عالم اليوم.</p>
+        </div>
+    </footer>
+
+    <!-- Theme Detail Modal -->
+    <div id="themeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modal-theme-title" class="text-2xl font-bold text-accent mb-4"></h3>
+            <span id="modal-theme-icon" class="text-5xl mb-4 block text-center"></span>
+            <p id="modal-theme-full-text" class="text-primary leading-relaxed mb-6"></p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                <button id="reflect-theme-btn" class="bg-accent text-white font-bold py-3 px-8 rounded-full text-lg bg-accent-hover transition-all duration-300 transform hover:scale-105">
+                    تأمل عميق ✨
+                </button>
+                <button id="practical-insight-btn" class="bg-accent text-white font-bold py-3 px-8 rounded-full text-lg bg-accent-hover transition-all duration-300 transform hover:scale-105">
+                    وجهة نظر عملية 🧭
+                </button>
+                <button id="link-to-past-btn" class="bg-accent text-white font-bold py-3 px-8 rounded-full text-lg bg-accent-hover transition-all duration-300 transform hover:scale-105">
+                    ربط بالماضي 🔗
+                </button>
+            </div>
+
+            <div id="modal-ai-response-area" class="mt-6 p-4 bg-secondary rounded-lg shadow-inner text-primary hidden">
+                <div class="loading-spinner hidden"></div>
+                <p id="modal-ai-response-text" class="leading-relaxed"></p>
+            </div>
+            
+            <!-- New div for historical link output -->
+            <div id="historical-link-output" class="mt-6 p-4 bg-secondary rounded-lg shadow-inner text-primary hidden">
+                <div class="loading-spinner hidden"></div>
+                <p></p>
+            </div>
+
+            <div class="mt-8 p-4 bg-primary rounded-lg shadow-inner text-primary">
+                <label for="personal-connection-input" class="block text-md font-medium text-accent mb-2">كيف يتصل هذا الموضوع بتجربتك؟ (اختياري)</label>
+                <textarea id="personal-connection-input" class="w-full h-24 p-3 text-primary bg-secondary rounded-lg border-2 border-accent/30 focus:outline-none focus:border-accent resize-y"></textarea>
+                <button id="get-personal-insight-btn" class="mt-4 bg-accent text-white font-bold py-2 px-6 rounded-full text-sm bg-accent-hover transition-all duration-300 transform hover:scale-105">
+                    احصل على بصيرة شخصية 💡
+                </button>
+                <div id="personal-insight-output" class="mt-3 p-3 bg-secondary rounded-lg shadow-inner text-primary hidden">
+                    <div class="loading-spinner hidden"></div>
+                    <p></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="fixed bottom-4 left-4 bg-secondary p-3 rounded-full shadow-lg flex items-center space-x-2 z-50">
+        <button id="toggle-music" class="text-accent text-xl focus:outline-none">
+            🎶
+        </button>
+        <button id="toggle-ambient-sound" class="text-accent text-xl focus:outline-none">
+            🍃
+        </button>
+    </div>
+
+    <script>
+        const themesData = [
+            {
+                title: "تيارُ السطحيةِ والبحثُ عن المعنى",
+                icon: "📱",
+                fullText: "في عصرٍ يتدفقُ فيهِ سيلُ المعلوماتِ والترفيهِ اللامُتناهي، نجدُ أنفسنا غارقينَ في بحرٍ من السطحيةِ، حيثُ تُغرينا الواجهاتُ البراقةُ وتُلهينا المؤثراتُ اللحظيةُ عن عمقِ الوجودِ. هذا التيارُ الجارفُ يُهددُ قدرتنا على التركيزِ والتفكيرِ العميقِ، ويُفقدُنا بوصلةَ المعنى الحقيقيِّ في زحامِ المشتتاتِ. هل نُصبحُ مُجردَ متلقينَ سطحيينَ، أم نُقاومُ هذا التيارَ لِنبحثَ عن الجوهرِ؟"
+            },
+            {
+                title: "سحرُ المادةِ وغيابُ القناعةِ",
+                icon: "💰",
+                fullText: "باتَ العالمُ اليومَ مدفوعاً بلهثٍ لا ينتهي وراءَ المادةِ والاستهلاكِ. نُعتقدُ أنَّ السعادةَ تُكمنُ في امتلاكِ المزيدِ، ونُقاسُ قيمتُنا بما نملكُ لا بما نحنُ عليهِ. هذا السحرُ الخادعُ للمادةِ يُولّدُ شعوراً دائماً بالنقصِ وعدمِ القناعةِ، ويُعيقُ رؤيتَنا لِما هوَ أعمقُ وأبقى في الحياةِ. هل نُعيدُ ترتيبَ أولوياتنا ونبحثُ عن غنى الروحِ بدلاً من غنى الجيوبِ؟"
+            },
+            {
+                title: "الانقسامُ والوحدةُ الضائعةُ",
+                icon: "💔",
+                fullText: "على الرغمِ من تطورِ وسائلِ الاتصالِ، نرى تزايداً مُقلقاً في الانقساماتِ الفكريةِ، السياسيةِ، والاجتماعيةِ. باتتِ الفئاتُ تتصارعُ، وتُعلي من شأنِ الخلافاتِ على حسابِ المشتركاتِ الإنسانيةِ. هذا التشرذمُ يُضعفُ الأمةَ ويُعيقُ تقدُّمَها. كيفَ نُعيدُ بناءَ جسورِ التواصلِ والتفاهمِ، ونجدُ الوحدةَ الضائعةَ في عالمٍ باتَ في أمسِّ الحاجةِ إليها؟"
+            },
+            {
+                title: "إرهاقُ الروحِ والبحثُ عن السكينةِ",
+                icon: "🧘",
+                fullText: "سرعةُ الإيقاعِ في عالمِ اليومِ وضغوطاتُ الحياةِ المستمرةُ تُلقي بظلالها على أرواحنا، وتُصيبُ الكثيرينَ بالإرهاقِ النفسيِّ والذهنيِّ. البحثُ عن السكينةِ أصبحَ ضرورةً مُلحةً في ظلِّ هذا الهرجِ والمرجِ. هل نُتقنُ فنَّ الاسترخاءِ والاتصالِ بِذواتنا الداخليةِ، أم نُسلّمُ أرواحنا لِدوامةِ الإرهاقِ؟"
+            },
+            {
+                title: "قوةُ العلمِ ومسؤوليةُ الإنسانِ",
+                icon: "🔬",
+                fullText: "العلمُ يُحققُ قفزاتٍ هائلةً، ويُقدمُ لنا أدواتٍ غيرَ مسبوقةٍ لِتغييرِ العالمِ. ولكنْ معَ هذهِ القوةِ العظيمةِ تأتي مسؤوليةٌ كبرى. فالعلمُ يمكنُ أن يكونَ أداةَ بناءٍ وهدمٍ معاً. كيفَ نُوجهُ هذهِ القوةَ الهائلةَ نحو الخيرِ والنفعِ البشريِّ، ونَحميهِ من أن يصبحَ سبباً في فسادٍ أو تدميرٍ؟"
+            },
+            {
+                title: "العزلةُ الافتراضيةُ وواقعُ الاتصالِ",
+                icon: "🌐",
+                fullText: "رغمَ أنَّ وسائلَ التواصلِ الاجتماعيِّ والعالمَ الرقميَّ قد فتحا آفاقاً جديدةً للاتصالِ، إلا أنهما قد أدَّيا paradoxically إلى نوعٍ من العزلةِ الافتراضيةِ. نُصبحُ مُحاطينَ بالاتصالاتِ السطحيةِ، ونفقدُ عمقَ العلاقاتِ الإنسانيةِ الحقيقيةِ وجهاً لوجهٍ. كيفَ نُوازنُ بينَ عالمنا الرقميِّ وواقعِ الاتصالِ البشريِّ، ونُعيدُ لِعلاقاتنا قيمتَها وجوهرَها؟"
+            }
+        ];
+
+        const themeModal = document.getElementById('themeModal');
+        const closeButton = themeModal.querySelector('.close-button');
+        const modalThemeTitle = document.getElementById('modal-theme-title');
+        const modalThemeIcon = document.getElementById('modal-theme-icon');
+        const modalThemeFullText = document.getElementById('modal-theme-full-text');
+        const reflectThemeBtn = document.getElementById('reflect-theme-btn');
+        const practicalInsightBtn = document.getElementById('practical-insight-btn');
+        const linkToPastBtn = document.getElementById('link-to-past-btn'); // New button
+        const modalAiResponseArea = document.getElementById('modal-ai-response-area');
+        const modalAiResponseText = document.getElementById('modal-ai-response-text');
+        const modalLoadingSpinner = modalAiResponseArea.querySelector('.loading-spinner');
+        const historicalLinkOutput = document.getElementById('historical-link-output'); // New output area
+        const historicalLinkText = historicalLinkOutput.querySelector('p');
+        const historicalLinkSpinner = historicalLinkOutput.querySelector('.loading-spinner');
+        const personalConnectionInput = document.getElementById('personal-connection-input');
+        const getPersonalInsightBtn = document.getElementById('get-personal-insight-btn');
+        const personalInsightOutput = document.getElementById('personal-insight-output');
+        const personalInsightText = personalInsightOutput.querySelector('p');
+        const personalInsightSpinner = personalInsightOutput.querySelector('.loading-spinner');
+
+        let currentThemeIndex = -1; // To keep track of the currently open theme
+
+        function openThemeModal(index) {
+            currentThemeIndex = index;
+            const theme = themesData[index];
+            modalThemeTitle.textContent = theme.title;
+            modalThemeIcon.textContent = theme.icon;
+            modalThemeFullText.textContent = theme.fullText;
+            
+            // Hide all AI response areas and clear their content initially
+            modalAiResponseArea.classList.add('hidden');
+            modalAiResponseText.textContent = '';
+            historicalLinkOutput.classList.add('hidden');
+            historicalLinkText.textContent = '';
+            personalInsightOutput.classList.add('hidden');
+            personalInsightText.textContent = '';
+            personalConnectionInput.value = ''; // Clear personal input
+
+            themeModal.style.display = 'flex'; // Use flex to center
+        }
+
+        closeButton.addEventListener('click', () => {
+            themeModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === themeModal) {
+                themeModal.style.display = 'none';
+            }
+        });
+
+        // Tone.js setup for background music
+        let backgroundSynth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "sawtooth" },
+            envelope: { attack: 2, decay: 0.5, sustain: 0.8, release: 3 }
+        }).toDestination();
+        backgroundSynth.volume.value = -18;
+
+        let musicLoop;
+        let isMusicPlaying = false;
+
+        function startMusic() {
+            if (!musicLoop) {
+                const chords = [
+                    ["C4", "E4", "G4"], ["F4", "A4", "C5"], ["G4", "B4", "D5"], ["A4", "C5", "E5"]
+                ];
+                let chordIndex = 0;
+                musicLoop = new Tone.Loop(time => {
+                    backgroundSynth.triggerAttackRelease(chords[chordIndex % chords.length], "2n", time);
+                    chordIndex++;
+                }, "2n").start(0);
+            }
+            Tone.Transport.start();
+            isMusicPlaying = true;
+        }
+
+        function stopMusic() {
+            Tone.Transport.stop();
+            Tone.Transport.cancel();
+            backgroundSynth.releaseAll();
+            musicLoop = null;
+            isMusicPlaying = false;
+        }
+
+        document.getElementById('toggle-music').addEventListener('click', async () => {
+            await Tone.start();
+            if (isMusicPlaying) {
+                stopMusic();
+                document.getElementById('toggle-music').textContent = '🔇';
+            } else {
+                startMusic();
+                document.getElementById('toggle-music').textContent = '🎶';
+            }
+        });
+
+        // Tone.js setup for ambient sound (e.g., wind, rain, very subtle drone)
+        let ambientSynth = new Tone.NoiseSynth({
+            envelope: {
+                attack: 0.005,
+                decay: 0.1,
+                sustain: 0.1,
+                release: 0.2
+            }
+        }).toDestination();
+        ambientSynth.volume.value = -25; // Very low volume for ambient
+        let ambientNoiseLoop;
+        let isAmbientSoundPlaying = false;
+
+        function startAmbientSound() {
+            if (!ambientNoiseLoop) {
+                ambientNoiseLoop = new Tone.Loop(time => {
+                    // Randomize pitch/volume slightly for a more natural ambient feel
+                    ambientSynth.triggerAttackRelease("8n", time, Math.random() * 0.5 + 0.5);
+                }, "4n").start(0); // Trigger a sound every 4 beats
+            }
+            Tone.Transport.start();
+            isAmbientSoundPlaying = true;
+        }
+
+        function stopAmbientSound() {
+            Tone.Transport.stop();
+            Tone.Transport.cancel();
+            ambientSynth.releaseAll();
+            ambientNoiseLoop = null;
+            isAmbientSoundPlaying = false;
+        }
+
+        document.getElementById('toggle-ambient-sound').addEventListener('click', async () => {
+            await Tone.start();
+            if (isAmbientSoundPlaying) {
+                stopAmbientSound();
+                document.getElementById('toggle-ambient-sound').textContent = '🔇'; // Muted icon
+            } else {
+                startAmbientSound();
+                document.getElementById('toggle-ambient-sound').textContent = '🍃'; // Playing icon
+            }
+        });
+
+        // Gemini API integration functions
+        async function callGeminiAPI(prompt, outputElement, spinnerElement) {
+            outputElement.classList.remove('hidden');
+            outputElement.querySelector('p').textContent = '';
+            spinnerElement.classList.remove('hidden');
+
+            const apiKey = "AIzaSyBt3W-fHQ-PPQBTPNlvKrC-XdVt_hz97QI"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    outputElement.querySelector('p').textContent = result.candidates[0].content.parts[0].text;
+                } else {
+                    outputElement.querySelector('p').textContent = 'تعذر توليد الرد. حاول مرة أخرى.';
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                outputElement.querySelector('p').textContent = 'حدث خطأ أثناء الاتصال بالنموذج. حاول مرة أخرى.';
+            } finally {
+                spinnerElement.classList.add('hidden');
+            }
+        }
+
+        reflectThemeBtn.addEventListener('click', () => {
+            if (currentThemeIndex === -1) return;
+            const themeText = themesData[currentThemeIndex].fullText;
+            const prompt = `بناءً على هذا النص الذي يصف تحديًا معاصرًا، استخرج سؤالاً تأملياً عميقاً يدفع القارئ للتفكير النقدي في واقعه وعلاقته بالموضوع. اجعل السؤال باللغة العربية الفصحى:\n\n"${themeText}"`;
+            callGeminiAPI(prompt, modalAiResponseArea, modalLoadingSpinner);
+        });
+
+        practicalInsightBtn.addEventListener('click', () => {
+            if (currentThemeIndex === -1) return;
+            const themeText = themesData[currentThemeIndex].fullText;
+            const prompt = `بناءً على هذا النص الذي يصف تحديًا معاصرًا، استخلص وجهة نظر عملية أو نصيحة موجزة لمساعدة الفرد على التعامل مع هذا التحدي في حياته اليومية. اجعل الإجابة باللغة العربية الفصحى ومباشرة:\n\n"${themeText}"`;
+            callGeminiAPI(prompt, modalAiResponseArea, modalLoadingSpinner);
+        });
+
+        linkToPastBtn.addEventListener('click', () => { // New event listener for historical link button
+            if (currentThemeIndex === -1) return;
+            const themeTitle = themesData[currentThemeIndex].title;
+            const themeText = themesData[currentThemeIndex].fullText;
+            const prompt = `بناءً على التحدي المعاصر التالي: "${themeTitle}"، والنص الكامل الخاص به: "${themeText}"، استخلص نمطًا تاريخيًا أو سنّة متكررة في مسيرة الأمم والشعوب ترتبط بهذا التحدي. لا تذكر أحداثًا تاريخية محددة أو شخصيات، بل ركز على السنن والعبر العامة. اجعل الإجابة باللغة العربية الفصحى وموجزة (فقرة واحدة).`;
+            callGeminiAPI(prompt, historicalLinkOutput, historicalLinkSpinner);
+        });
+
+        getPersonalInsightBtn.addEventListener('click', () => {
+            if (currentThemeIndex === -1) return;
+            const personalText = personalConnectionInput.value;
+            const themeText = themesData[currentThemeIndex].fullText;
+            if (personalText.trim() === '') {
+                personalInsightOutput.classList.remove('hidden');
+                personalInsightText.textContent = 'من فضلك، اكتب تجربتك أولاً للحصول على بصيرة شخصية.';
+                return;
+            }
+            const prompt = `بناءً على هذا النص المتعلق بتحدٍ معاصر:\n"${themeText}"\n\nوربطًا بتجربة المستخدم الشخصية التالية:\n"${personalText}"\n\nقدم بصيرة موجزة (سؤال تأملي أو ملاحظة) تربط تجربة المستخدم بالموضوع العام، لتشجعه على الفهم الأعمق. اجعل الإجابة باللغة العربية الفصحى:\n\n`;
+            callGeminiAPI(prompt, personalInsightOutput, personalInsightSpinner);
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
